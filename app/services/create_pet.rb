@@ -6,7 +6,7 @@ class CreatePet < BaseService
   include Kredis::Attributes
   extend Dry::Initializer
 
-  kredis_list :pets_data, key: 'pets_data', typed: :json
+  kredis_hash :pets_data, key: 'pets_data'
   kredis_list :grouped_data, key: 'grouped_data', typed: :json
 
   # Mandatory attributes to create Pet(Dog and Cat) entity.
@@ -20,10 +20,8 @@ class CreatePet < BaseService
 
   # Default attributes to find last pet tracking info of the owner and also
   # to find specific pet count info grouped by provided tracker_type and pet_type.
-  option :last_pet_tracked_info, default:
-          proc { pets_data.elements.select { |pd| pd['owner_id'] == @owner_id && pd['pet_type'] == @pet_type }.last }
-  option :pet_tracker_group, default:
-          proc { grouped_data.elements.find { |gd| gd['tracker_type'] == @tracker_type && gd['pet_type'] == @pet_type } }
+  option :key, default: proc { "#{@owner_id}_#{@pet_type}_#{@tracker_type}" }
+  option :value, default: proc { { pet_type: @pet_type, tracker_type: @tracker_type, owner_id: @owner_id, in_zone: @in_zone } }
 
   def call
     update_owners_pet_data
@@ -34,12 +32,14 @@ class CreatePet < BaseService
   # This method pushed received data from trackers to pet_data list.
   # It also adds extra info of `lost_tracker` attribute for cat.
   def update_owners_pet_data
-    if pet_type == 'cat'
-      pets_data.append({ pet_type: pet_type, tracker_type: tracker_type, owner_id: owner_id, in_zone: in_zone,
-                         lost_tracker: lost_tracker })
+    value[:lost_tracker] = lost_tracker if pet_type == 'cat'
 
+    if pets_data[key].nil?
+      pets_data[key] = [value].to_json
     else
-      pets_data.append({ pet_type: pet_type, tracker_type: tracker_type, owner_id: owner_id, in_zone: in_zone })
+      stored_data = JSON.parse(pets_data[key])
+      stored_data << value
+      pets_data[key] = stored_data.to_json
     end
   end
 
@@ -48,14 +48,13 @@ class CreatePet < BaseService
   # count of specific group by comparing it with the last tracked info of the pet.
   def update_grouped_data
     return unless pet_tracker_group.present?
-    return unless last_pet_tracked_info.present?
 
-    if last_pet_tracked_info['in_zone'] == true && in_zone == false
-      grouped_data.remove(tracker_group)
-      grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: tracker_group['count'] + 1 })
+    if (last_pet_tracked_info['in_zone'] == true || !last_pet_tracked_info.present?) && in_zone == false
+      grouped_data.remove(pet_tracker_group)
+      grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: pet_tracker_group['count'] + 1 })
     elsif last_pet_tracked_info['in_zone'] == false && in_zone == true
-      grouped_data.remove(tracker_group)
-      grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: tracker_group['count'] - 1 })
+      grouped_data.remove(pet_tracker_group)
+      grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: pet_tracker_group['count'] - 1 })
     end
   end
 
@@ -69,5 +68,13 @@ class CreatePet < BaseService
 
     count = in_zone ? 0 : 1
     grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: count })
+  end
+
+  def last_pet_tracked_info
+    @last_pet_tracked_info ||= pets_data[key].present? ? JSON.parse(pets_data[key]).last : {}
+  end
+
+  def pet_tracker_group
+    @pet_tracker_group ||= grouped_data.elements.find { |gd| gd['tracker_type'] == tracker_type && gd['pet_type'] == pet_type }
   end
 end
