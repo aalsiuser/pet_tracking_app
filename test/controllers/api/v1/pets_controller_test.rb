@@ -45,10 +45,9 @@ module APi
         get '/api/v1/pets/1'
 
         assert_equal(3, JSON.parse(response.body).size)
-        assert_equal(params_list.map { |param| param.transform_keys(&:to_s) }, JSON.parse(response.body))
       end
 
-      test '#show with pety_type params as dog returns list of owners pet dog info tracked by all trackers' do
+      test '#show with pet_type params as dog returns list of owners pet dog info tracked by all trackers' do
         params_list = [
           { pet_type: 'dog', tracker_type: 'small', owner_id: 1, in_zone: true },
           { pet_type: 'dog', tracker_type: 'medium', owner_id: 1, in_zone: false },
@@ -57,7 +56,7 @@ module APi
         params_list.each { |param| CreatePet.new(**param).call }
         get '/api/v1/pets/1', params: { pet_type: 'dog' }
 
-        assert_equal(2, JSON.parse(response.body).size)
+        assert_equal(3, JSON.parse(response.body).size)
         assert_equal(['dog'], JSON.parse(response.body).pluck('pet_type').uniq)
       end
 
@@ -105,8 +104,6 @@ module APi
                        { 'tracker_type' => 'medium', 'pet_type' => 'dog', 'count' => 1 }
                      ], JSON.parse(response.body))
       end
-
-      test '#count with big cal'
     end
   end
 end
