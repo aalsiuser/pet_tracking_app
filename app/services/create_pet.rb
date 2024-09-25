@@ -22,6 +22,8 @@ class CreatePet < BaseService
   # to find specific pet count info grouped by provided tracker_type and pet_type.
   option :key, default: proc { "#{@owner_id}_#{@pet_type}_#{@tracker_type}" }
   option :value, default: proc { { pet_type: @pet_type, tracker_type: @tracker_type, owner_id: @owner_id, in_zone: @in_zone } }
+  option :last_pet_tracked_info, default: proc { pets_data[key].present? ? JSON.parse(pets_data[key]).last : {} }
+  option :pet_tracker_group, default: proc { grouped_data.elements.find { |gd| gd['tracker_type'] == tracker_type && gd['pet_type'] == pet_type } }
 
   def call
     update_owners_pet_data
@@ -68,13 +70,5 @@ class CreatePet < BaseService
 
     count = in_zone ? 0 : 1
     grouped_data.append({ tracker_type: tracker_type, pet_type: pet_type, count: count })
-  end
-
-  def last_pet_tracked_info
-    @last_pet_tracked_info ||= pets_data[key].present? ? JSON.parse(pets_data[key]).last : {}
-  end
-
-  def pet_tracker_group
-    @pet_tracker_group ||= grouped_data.elements.find { |gd| gd['tracker_type'] == tracker_type && gd['pet_type'] == pet_type }
   end
 end
