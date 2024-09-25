@@ -104,6 +104,35 @@ module APi
                        { 'tracker_type' => 'medium', 'pet_type' => 'dog', 'count' => 1 }
                      ], JSON.parse(response.body))
       end
+
+      test '#count returns correct count of pets with tracker_type as big and pet_type as dog' do
+        params_list = [
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 1, in_zone: true },
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 1, in_zone: false },
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 1, in_zone: false },
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 2, in_zone: true },
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 2, in_zone: false }
+        ]
+
+        params_list.each { |param| CreatePet.new(**param).call }
+        get '/api/v1/pets/count'
+
+        assert_equal([{ 'tracker_type' => 'big', 'pet_type' => 'dog', 'count' => 2 }], JSON.parse(response.body))
+      end
+
+      test '#index returns list of pet tracking info of all the pets' do
+        params_list = [
+          { pet_type: 'cat', tracker_type: 'small', owner_id: 1, in_zone: true, lost_tracker: false },
+          { pet_type: 'dog', tracker_type: 'small', owner_id: 2, in_zone: true },
+          { pet_type: 'dog', tracker_type: 'big', owner_id: 1, in_zone: false },
+          { pet_type: 'dog', tracker_type: 'medium', owner_id: 3, in_zone: false }
+        ]
+        params_list.each { |param| CreatePet.new(**param).call }
+
+        get '/api/v1/pets'
+
+        assert_equal(4, JSON.parse(response.body).size)
+      end
     end
   end
 end
