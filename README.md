@@ -8,6 +8,65 @@ This is a pet tracking application that stores and retrieves data from different
 - Run your terminal. Go to path of the repo where you have downloaded the repo.
 - Run `docker-compose  up --build`. This will take a while first time to download all dependencies.
 - That is it and go to http://localhost:3000/ to make sure it is up and running.
+- You can run both unit and controller tests by running `rails test`. It executes all the test cases.
+
+## Example requests for CURL to store, retrieve the data
+
+### Create/Store the data
+
+```
+curl --location 'http://localhost:3000/api/v1/pets' \
+--header 'Content-Type: application/json' \
+--data '{
+    "pet_type": "cat",
+    "tracker_type": "medium",
+    "owner_id": 100,
+    "in_zone": true,
+    "lost_tracker": false
+}'
+```
+
+### Retrieve all the pets data of different owners with different filter options
+
+#### To fetch all the pets data
+```
+curl http://localhost:3000/api/v1/pets
+```
+
+#### To fetch all the pets data filtered by pet_type and tracker_type param
+
+```
+curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets
+```
+
+### Retrieve pets data of a specific owner with different filter options
+
+#### To fetch owners pets data
+
+```
+curl http://localhost:3000/api/v1/pets/:owner_id
+```
+
+#### To fetch owners pet data filtered by pet_type and tracker_type param
+
+```
+ curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets/:owner_id
+```
+
+### Retrieve count of pets outside power saving zone grouped by pet_type and tracker_type
+
+#### To fetch count of pets outside the zone of all the combination of grouped data by pet_type and tracker_type
+
+```
+curl http://localhost:3000/api/v1/pets/count
+```
+
+#### To fetch count of pets outside the zone for a specific pet_type and grouped_type param
+
+```
+curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets/count
+```
+
 
 ## Code Organization
 
@@ -20,7 +79,7 @@ It has only one controller called `PetsController`. Which is responsible for rec
 - `count` action --> Responsible for retrieving count of pets outside the power saving zone. It supports filtering of grouped count data based on `pet_type` and `tracker_type`.
 
 ### Services
-- Service classes handle different logic to store, retrieve data based on different filters. It is also responsible for validating payload sent by different trackers before storing the data in redis to maintain data consistency. It is also responsible for validating different filter params while retrieving the data.
+Service classes handle different logic to store, retrieve data based on different filters. It is also responsible for validating payload sent by different trackers before storing the data in redis to maintain data consistency. It is also responsible for validating different filter params while retrieving the data.
 
 - `CreatePet` -->  This handles validating the pet info attributes and its type, It is also responsible for storing the pet tracking information. This also handles the logic to update count of pets outside the zone grouped by pet_type and tracker_type.
 
@@ -89,61 +148,4 @@ To store the pet tacking information using hash mapping. With the unique key bas
   { 'tracker_type' => 'medium', 'pet_type' => 'dog', 'count' => 1 },
   { 'tracker_type' => 'big', 'pet_type' => 'dog', 'count' => 1 },
   { 'tracker_type' => 'big', 'pet_type' => 'cat', 'count' => 1 }
-```
-
-## Example requests for CURL to store, retrieve the data
-
-### Create/Store the data
-
-```
-curl --location 'http://localhost:3000/api/v1/pets' \
---header 'Content-Type: application/json' \
---data '{
-    "pet_type": "cat",
-    "tracker_type": "medium",
-    "owner_id": 100,
-    "in_zone": true,
-    "lost_tracker": false
-}'
-```
-
-### Retrieve all the pets data of different owners with different filter options
-
-#### To fetch all the pets data
-```
-curl http://localhost:3000/api/v1/pets
-```
-
-#### To fetch all the pets data filtered by pet_type and tracker_type param
-
-```
-curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets
-```
-
-### Retrieve pets data of a specific owner with different filter options
-
-#### To fetch owners pets data
-
-```
-curl http://localhost:3000/api/v1/pets/:owner_id
-```
-
-#### To fetch owners pet data filtered by pet_type and tracker_type param
-
-```
- curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets/:owner_id
-```
-
-### Retrieve count of pets outside power saving zone grouped by pet_type and tracker_type
-
-#### To fetch count of pets outside the zone of all the combination of grouped data by pet_type and tracker_type
-
-```
-curl http://localhost:3000/api/v1/pets/count
-```
-
-#### To fetch count of pets outside the zone for a specific pet_type and grouped_type param
-
-```
-curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://localhost:3000/api/v1/pets/count
 ```
