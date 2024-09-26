@@ -17,9 +17,9 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis://redis:6379/0  # Point to the Redis container
+      - REDIS_URL=redis://redis:6379/0
     volumes:
-      - .:/docker/app # add our local code to dockerfile
+      - .:/docker/app
 
 volumes:
   redis_data:

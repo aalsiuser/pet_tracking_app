@@ -33,6 +33,8 @@ class CreatePet < BaseService
     update_owners_pet_data
     init_grouped_data
     update_grouped_data
+
+    true
   end
 
   # This method pushed received data from trackers to pet_data list.
