@@ -3,12 +3,12 @@
 This is a pet tracking application that stores and retrieves data from different trackers for different pets.
 
 ## How to run the application
-- Install Docker Engine depending upon your type of system. You can find different packages [here](https://docs.docker.com/engine/install/).
-- Pull the repo to your local system.
-- Run your terminal. Go to path of the repo where you have downloaded the repo.
-- Run `docker-compose  up --build`. This will take a while first time to download all dependencies.
-- That is it and go to http://localhost:3000/ to make sure it is up and running.
-- You can run both unit and controller tests by running `rails test`. It executes all the test cases.
+- Install Docker Engine depending on your system. You can find installation packages here.
+- Clone the repository to your local system.
+- Open a terminal and navigate to the repository's directory.
+- Run the following command: docker-compose up --build. The initial run may take some time as dependencies are downloaded.
+- Once the setup is complete, visit http://localhost:3000/ to verify that the application is running.
+- To run unit and controller tests, use the command rails test. This will execute all the test cases.
 
 ## Example requests for CURL to store, retrieve the data
 
@@ -71,7 +71,7 @@ curl -G -d "pet_type=#{dog|cat}" -d "tracker_type=#{small|medium|big}" http://lo
 ## Code Organization
 
 ### Controllers
-It has only one controller called `PetsController`. Which is responsible for receiving the requests from different trackers to store the date, query for data and also to provide information about the number of pets currently outside the power saving zone grouped by pet type and tracker type.
+The application uses a single controller, PetsController, which handles incoming requests from different trackers to store data, query data, and provide information on the number of pets currently outside the power-saving zone, grouped by pet_type and tracker_type.
 
 - `index` action --> Responsible for retrieving data from redis. It supports filtering too, You can filter it based on `pet_type` and `tracker_type` params.
 - `create` acton --> Responsible for creating data in redis. It supports different params i.e `owner_id`, `pet_type`, `tacker_type`, `in_zone` and `lost_tracker`.
@@ -79,20 +79,20 @@ It has only one controller called `PetsController`. Which is responsible for rec
 - `count` action --> Responsible for retrieving count of pets outside the power saving zone. It supports filtering of grouped count data based on `pet_type` and `tracker_type`.
 
 ### Services
-Service classes handle different logic to store, retrieve data based on different filters. It is also responsible for validating payload sent by different trackers before storing the data in redis to maintain data consistency. It is also responsible for validating different filter params while retrieving the data.
+Service classes manage the logic for storing and retrieving data based on different filters. They are also responsible for validating payloads from different trackers before storing data in Redis to maintain data consistency, as well as validating filter parameters during data retrieval.
 
-- `CreatePet` -->  This handles validating the pet info attributes and its type, It is also responsible for storing the pet tracking information. This also handles the logic to update count of pets outside the zone grouped by pet_type and tracker_type.
+- `CreatePet`: This service validates pet information attributes and their types, and manages the storage of pet tracking information. It also handles updating the count of pets outside the zone, grouped by `pet_type` and `tracker_type`.
 
-- `SearchPets` -->  This handles querying/searching of pets according owner_id, pet_type, tracker_type. This uses same redis key `pets_data` list which stores all the pet information to filter/search for the tracking info.
-This creates key according to arguments given and finds all the keys in the `pets_data`that match the key. Then we loop the keys to fetch tracking info of all the pets with different trackers.
+- `SearchPets`: This service handles querying and searching for pets based on `owner_id`, `pet_type`, and `tracker_type`. It uses the same Redis key, pets_data, which stores all the pet information, to filter and search for tracking info. Keys are constructed according to the provided arguments, and matching keys are used to fetch the tracking information for all pets with different trackers.
 
-- `CountPets` --> This handled querying/searching to fetch count of pets outside power saving zone from the `grouped_data` list which is grouped by `pet_type` and `tracker_type`. This takes 2 optional arguments to fetch specific group count.
+- `CountPets`: This service manages querying and retrieving the count of pets outside the power-saving zone from the grouped_data list, grouped by `pet_type` and `tracker_type`. It accepts two optional arguments to fetch specific group counts.
 
 ## Database Design
-I've used `Redis` as in-memory database. It is one of the fastest out there and supports different data structure and scalar types.
+The application uses Redis as its in-memory database. Redis is one of the fastest databases available and supports a variety of data structures and scalar types.
 
-### Design DS to store the data
-I thought of two Data structures to store the tracking data. Both has pros and cons. I gave thought and went with **second option** as system needs to be efficient in querying data specifically when it comes to data receiving from the trackers which sends a huge amounts of data.
+### Data Structure for Storing Pet Tracking Information
+Two options were considered for storing tracking data. After evaluating the pros and cons, I chose the second option to ensure efficient data querying, especially since the system receives large amounts of data from trackers.
+
 
 ### First Option
 One with the straight forward option of storing all the data in a single array.For example below
@@ -149,3 +149,5 @@ To store the pet tacking information using hash mapping. With the unique key bas
   { 'tracker_type' => 'big', 'pet_type' => 'dog', 'count' => 1 },
   { 'tracker_type' => 'big', 'pet_type' => 'cat', 'count' => 1 }
 ```
+
+
