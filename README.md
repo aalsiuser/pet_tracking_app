@@ -5,7 +5,7 @@ This is a pet tracking application that stores and retrieves data from different
 ## How to run the application
 - Install Docker Engine depending upon your type of system. You can find different packages [here](https://docs.docker.com/engine/install/).
 - Pull the repo to your local system.
-- Run your terminal. Go to directly where you have downloaded the repo.
+- Run your terminal. Go to path of the repo where you have downloaded the repo.
 - Run docker-compose  up --build. This will take a while first time to download all dependencies.
 - That is it and go to http://localhost:3000/ to make sure it is up and running.
 
