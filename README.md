@@ -35,7 +35,7 @@ I've used `Redis` as in-memory database. It is one of the fastest out there and 
 ### Design DS to store the data
 I thought of two Data structures to store the tracking data. Both has pros and cons. I gave thought and went with **second option** as system needs to be efficient in querying data specifically when it comes to data receiving from the trackers which sends a huge amounts of data.
 
-#### First Option
+### First Option
 One with the straight forward option of storing all the data in a single array.For example below
 
 ```
@@ -54,7 +54,7 @@ One with the straight forward option of storing all the data in a single array.F
 #### Cons
 - Not so efficient to retrieve the data. We need to make a linear search every time to query for the data which has runtime complexity of O(N).
 
-## Second Option
+### Second Option
 To store the pet tacking information using hash mapping. With the unique key based on `owner_id`, `pet_type` and `tracker_type`. Each key has all the pet tracking information belonging to owners pet. For example below
 
 ```
