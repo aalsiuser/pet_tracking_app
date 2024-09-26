@@ -137,7 +137,7 @@ To store the pet tacking information using hash mapping. With the unique key bas
 #### Cons
 - Difficult to store and retrieve information. We need to convert data to json for storing the data and parse the json while retrieving data.
 
-### Design DS to store the count of pets outside power saving zone.
+### Data Structure for Storing the Count of Pets Outside the Power-Saving Zone
 - I thought it is easy to store and update the count while storing the data instead of fetching count at runtime of the request.
 - This made me to come to decision to store all the data in a `hash` which updates the count according to information provided `in_zone` attribute of different trackers.
 - You can refer `update_grouped_data` method of `CreatePet` service for the logic to update the count according to `pet_type` and `tracker_type`.
