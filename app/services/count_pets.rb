@@ -17,7 +17,9 @@ class CountPets < BaseService
 
     filtered_grouped_data = filtered_grouped_data.select { |c| c['pet_type'] == pet_type } if pet_type.present?
 
-    filtered_grouped_data = filtered_grouped_data.select { |c| c['tracker_type'] == tracker_type } if tracker_type.present?
+    if tracker_type.present?
+      filtered_grouped_data = filtered_grouped_data.select { |c| c['tracker_type'] == tracker_type }
+    end
 
     filtered_grouped_data
   end

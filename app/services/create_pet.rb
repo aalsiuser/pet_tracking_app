@@ -2,6 +2,7 @@
 
 # This handles validating the pet info attributes and its type, It is also responsible for storing the pet tracking
 # information. This also handles the logic to update count of pets outside the zone grouped by pet_type and tracker_type.
+
 class CreatePet < BaseService
   include Kredis::Attributes
   extend Dry::Initializer
@@ -20,10 +21,13 @@ class CreatePet < BaseService
 
   # Default attributes to find last pet tracking info of the owner and also
   # to find specific pet count info grouped by provided tracker_type and pet_type.
-  option :key, default: proc { "#{@owner_id}_#{@pet_type}_#{@tracker_type}" }
-  option :value, default: proc { { pet_type: @pet_type, tracker_type: @tracker_type, owner_id: @owner_id, in_zone: @in_zone } }
-  option :last_pet_tracked_info, default: proc { pets_data[key].present? ? JSON.parse(pets_data[key]).last : {} }
-  option :pet_tracker_group, default: proc { grouped_data.elements.find { |gd| gd['tracker_type'] == tracker_type && gd['pet_type'] == pet_type } }
+  option :key, default: proc { "#{owner_id}_#{pet_type}_#{tracker_type}" }
+  option :value, default:
+          proc { { pet_type: pet_type, tracker_type: tracker_type, owner_id: owner_id, in_zone: in_zone } }
+  option :last_pet_tracked_info, default:
+          proc { pets_data[key].present? ? JSON.parse(pets_data[key]).last : {} }
+  option :pet_tracker_group, default: 
+          proc { grouped_data.elements.find { |gd| gd['tracker_type'] == tracker_type && gd['pet_type'] == pet_type } }
 
   def call
     update_owners_pet_data
