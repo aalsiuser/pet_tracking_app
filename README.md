@@ -18,11 +18,11 @@ This is a pet tracking application that stores and retrieves data from different
 curl --location 'http://localhost:3000/api/v1/pets' \
 --header 'Content-Type: application/json' \
 --data '{
-    "pet_type": "cat",
-    "tracker_type": "medium",
-    "owner_id": 100,
-    "in_zone": true,
-    "lost_tracker": false
+    "pet_type": "#{cat|dog}",
+    "tracker_type": "#{small|medium|big}",
+    "owner_id": Int,
+    "in_zone": Boolean,
+    "lost_tracker": Boolean
 }'
 ```
 
