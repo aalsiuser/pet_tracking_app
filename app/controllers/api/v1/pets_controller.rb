@@ -10,7 +10,7 @@ module Api
 
       # GET /api/v1/pets
       def index
-        result = SearchPets.new(**search_params).call
+        result = SearchPets.new(**filter_params).call
 
         render json: result
       end
@@ -32,7 +32,7 @@ module Api
 
       # GET /api/v1/pets/count
       def count
-        result = CountPets.new(**count_params).call
+        result = CountPets.new(**filter_params).call
 
         render json: result
       end
@@ -43,7 +43,7 @@ module Api
         params.require(:pet).permit(:pet_type, :tracker_type, :owner_id, :in_zone, :lost_tracker).to_h.symbolize_keys
       end
 
-      def count_params
+      def filter_params
         params.permit(:pet_type, :tracker_type).to_h.symbolize_keys
       end
 
