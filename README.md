@@ -1,6 +1,6 @@
 # Pet Tracking Application
 
-This is a pet tracking application that stores data from different trackers for different pets.
+This is a pet tracking application that stores and retrieves data from different trackers for different pets.
 
 ## How to run the application
 - Install Docker Engine depending upon your type of system. You can find different packages [here](https://docs.docker.com/engine/install/).
